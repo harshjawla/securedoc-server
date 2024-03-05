@@ -187,6 +187,9 @@ app.post("/content", async (req, res) => {
 app.post("/userfiles", async (req, res) => {
   const token = req.cookies.jwt;
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+    if(err) {
+      return res.status(500).json("Error: ", err);
+    }
     const username = decoded.userId;
     const files = await Content.find({ username });
     res.status(200).json(files);
