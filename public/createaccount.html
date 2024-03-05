@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Front Page</title>
+    <link rel="stylesheet" href="./login.css">
+</head>
+    <body>
+    <!-- <div class="navbar">Nav</div> -->
+    <div class="body">
+        <div class="form">
+            <form class="form__content" action="/createaccount" method="post">
+                <div class="form__content__header">
+                    <h1 class="form__content__heading">Create Account</h1>
+                </div>
+                <div class="form__field">
+                    <label class="form__label" for="username">Email address</label>
+                    <input class="form__input" type="email" name="username" id="email">
+                </div>
+                <div class="form__field">
+                    <label class="form__label" for="password">Password</label>
+                    <input class="form__input" type="password" name="password" id="pwd">
+                </div>
+                <div class="form__field form__submit">
+                    <input class="btn" type="submit" value="Sign Up">
+                    <!-- <a href="#!">Forgot password?</a> -->
+                </div>
+            </form>
+            <div class="form__footer">
+                <a href="/">Login</a>
+            </div>
+        </div>
+        <div class="cta">
+            <img src="./images/Login Image.jpg" alt="Company Image" class="img">
+        </div>
+    </div>
+<!-- <div class="footer">Footer</div> -->
+</body>
+</html>
