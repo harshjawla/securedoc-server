@@ -79,6 +79,7 @@ const Content = new mongoose.model("Content", contentSchema);
 const User = new mongoose.model("User", userSchema);
 
 app.use(express.static("public"));
+app.use(jwt());
 
 const PORT = 4000;
 const saltRounds = 10;
