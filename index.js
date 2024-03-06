@@ -30,6 +30,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const MONGO_URL = process.env.MONGODB_URL;
 
+const temp="THIS IS MY SECRET";
+
 mongoose.connect(MONGO_URL);
 
 const userSchema = new mongoose.Schema({
@@ -118,10 +120,12 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
+  console.log("Received login request for username:", username); // Add logging statement
   const user = await User.findOne({ username });
   if (user) {
     bcrypt.compare(password, user.password, function (err, result) {
       if (err) {
+        console.error("Error occurred during password comparison:", err); // Add logging statement
         return res.status(500).send("Internal Server Error");
       }
       if (result) {
@@ -131,18 +135,21 @@ app.post("/login", async (req, res) => {
           process.env.JWT_SECRET,
           { expiresIn: "1d" }
         );
+        console.log("JWT token generated successfully for user:", user.username); // Add logging statement
         // Set the JWT token as an HTTP-only cookie
-        // console.log(token);
         res.cookie("jwt", token, { httpOnly: true });
         res.status(200).json({ message: "Login successful" });
       } else {
+        console.log("Invalid password for user:", user.username); // Add logging statement
         res.status(401).json({ message: "Invalid username or password" });
       }
     });
   } else {
+    console.log("User not found:", username); // Add logging statement
     return res.status(400).send("User not registered");
   }
 });
+
 
 app.post("/logout", async (req, res) => {
   try {
@@ -157,7 +164,7 @@ app.post("/logout", async (req, res) => {
 app.get("/authenticate", (req, res) => {
   const token = req.cookies.jwt;
   if (token) {
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, temp, (err, decoded) => {
       if (err) {
         console.error("Error verifying token:", err);
         return res.status(401).json({ message: "Unauthorized" });
@@ -191,7 +198,7 @@ app.post("/userfiles", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized: JWT token missing" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, temp);
     const username = decoded.userId;
 
     const files = await Content.find({ username });
@@ -205,7 +212,7 @@ app.post("/userfiles", async (req, res) => {
 app.post("/create", async (req, res) => {
   const { name } = req.body;
   const token = req.cookies.jwt;
-  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+  jwt.verify(token, temp, async (err, decoded) => {
     const username = decoded.userId;
     const files = await Content.find({ username, name });
     if (files.length > 0) {
@@ -235,7 +242,7 @@ app.post("/update", async (req, res) => {
 app.post("/delete", async (req, res) => {
   const { name } = req.body;
   const token = req.cookies.jwt;
-  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+  jwt.verify(token, temp, async (err, decoded) => {
     const username = decoded.userId;
     const result = await Content.deleteOne({ username, name });
     if (result) {
@@ -249,7 +256,7 @@ app.post("/delete", async (req, res) => {
 app.post("/share", async (req, res) => {
   const { name, emails } = req.body;
   const token = req.cookies.jwt;
-  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+  jwt.verify(token, temp, async (err, decoded) => {
     const username = decoded.userId;
     const alreadyExist = await Share.findOne({ owner: username, name: name });
     if (alreadyExist) {
@@ -299,7 +306,7 @@ app.post("/all", async (req, res) => {
 app.post("/sharing", async (req, res) => {
   const { username, docName } = req.body;
   const token = req.cookies.jwt;
-  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+  jwt.verify(token, temp, async (err, decoded) => {
     if (err) {
       return res.status(500).send("please login");
     }
