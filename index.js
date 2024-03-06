@@ -136,7 +136,7 @@ app.post("/login", async (req, res) => {
         );
         console.log("JWT token generated successfully for user:", user.username); // Add logging statement
         // Set the JWT token as an HTTP-only cookie
-        res.cookie("jwt", token, { httpOnly: true });
+        res.cookie("jwt", token, { httpOnly: false });
         res.status(200).json({ message: "Login successful" });
       } else {
         console.log("Invalid password for user:", user.username); // Add logging statement
