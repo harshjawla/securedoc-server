@@ -125,7 +125,7 @@ app.post("/login", async (req, res) => {
     bcrypt.compare(password, user.password, function (err, result) {
       if (err) {
         console.error("Error occurred during password comparison:", err); // Add logging statement
-        return res.status(500).send("Internal Server Error");
+        return res.status(500).json({error: err});
       }
       if (result) {
         // Generate JWT token with user ID
