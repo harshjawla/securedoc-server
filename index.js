@@ -132,6 +132,7 @@ app.post("/login", async (req, res) => {
         const token = jwt.sign(
           { userId: user.username },
           process.env.JWT_SECRET,
+          { algorithm: 'RS256' },
           { expiresIn: "1d" }
         );
         console.log("JWT token generated successfully for user:", user.username); // Add logging statement
