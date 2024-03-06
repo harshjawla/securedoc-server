@@ -28,7 +28,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const MONGO_URL=process.env.MONGODB_URL;
+const MONGO_URL = process.env.MONGODB_URL;
 
 mongoose.connect(MONGO_URL);
 
@@ -185,15 +185,21 @@ app.post("/content", async (req, res) => {
 });
 
 app.post("/userfiles", async (req, res) => {
-  const token = req.cookies.jwt;
-  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-    if(err) {
-      return res.status(500).json("Error: ", err);
+  try {
+    const token = req.cookies.jwt;
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized: JWT token missing" });
     }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const username = decoded.userId;
+
     const files = await Content.find({ username });
     res.status(200).json(files);
-  });
+  } catch (error) {
+    console.error("Error fetching user files:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 app.post("/create", async (req, res) => {
@@ -294,7 +300,7 @@ app.post("/sharing", async (req, res) => {
   const { username, docName } = req.body;
   const token = req.cookies.jwt;
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-    if(err){
+    if (err) {
       return res.status(500).send("please login");
     }
     const myUserName = decoded.userId;
