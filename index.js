@@ -164,7 +164,7 @@ app.post("/logout", async (req, res) => {
 app.get("/authenticate", (req, res) => {
   const token = req.cookies.jwt;
   if (token) {
-    jwt.verify(token, temp, (err, decoded) => {
+    jwt.verify(token, temp, { algorithms: ['RS256'] }, (err, decoded) => {
       if (err) {
         console.error("Error verifying token:", err);
         return res.status(401).json({ message: "Unauthorized" });
@@ -198,7 +198,7 @@ app.post("/userfiles", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized: JWT token missing" });
     }
 
-    const decoded = jwt.verify(token, temp);
+    const decoded = jwt.verify(token, temp, { algorithms: ['RS256'] });
     const username = decoded.userId;
 
     const files = await Content.find({ username });
@@ -212,7 +212,7 @@ app.post("/userfiles", async (req, res) => {
 app.post("/create", async (req, res) => {
   const { name } = req.body;
   const token = req.cookies.jwt;
-  jwt.verify(token, temp, async (err, decoded) => {
+  jwt.verify(token, temp, { algorithms: ['RS256'] }, async (err, decoded) => {
     const username = decoded.userId;
     const files = await Content.find({ username, name });
     if (files.length > 0) {
@@ -242,7 +242,7 @@ app.post("/update", async (req, res) => {
 app.post("/delete", async (req, res) => {
   const { name } = req.body;
   const token = req.cookies.jwt;
-  jwt.verify(token, temp, async (err, decoded) => {
+  jwt.verify(token, temp, { algorithms: ['RS256'] },  async (err, decoded) => {
     const username = decoded.userId;
     const result = await Content.deleteOne({ username, name });
     if (result) {
@@ -256,7 +256,7 @@ app.post("/delete", async (req, res) => {
 app.post("/share", async (req, res) => {
   const { name, emails } = req.body;
   const token = req.cookies.jwt;
-  jwt.verify(token, temp, async (err, decoded) => {
+  jwt.verify(token, temp, { algorithms: ['RS256'] },  async (err, decoded) => {
     const username = decoded.userId;
     const alreadyExist = await Share.findOne({ owner: username, name: name });
     if (alreadyExist) {
@@ -306,7 +306,7 @@ app.post("/all", async (req, res) => {
 app.post("/sharing", async (req, res) => {
   const { username, docName } = req.body;
   const token = req.cookies.jwt;
-  jwt.verify(token, temp, async (err, decoded) => {
+  jwt.verify(token, temp, { algorithms: ['RS256'] }, async (err, decoded) => {
     if (err) {
       return res.status(500).send("please login");
     }
