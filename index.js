@@ -150,7 +150,7 @@ app.post("/login", async (req, res) => {
 
 app.post("/logout", async (req, res) => {
   try {
-    res.cookie("jwt", " ");
+    res.cookie("jwt", " ", { httpOnly: true, sameSite: "None", secure: true, domain: "securedoc-server.vercel.app" });
     return res.status(200).send("Logged Out Successfully");
   } catch (error) {
     console.error("Error Logging out", error);
