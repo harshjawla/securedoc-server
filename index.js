@@ -10,7 +10,6 @@ const cookieParser = require("cookie-parser");
 const app = express();
 app.use(express.static("public"));
 
-
 app.use(
   cors({
     origin: "https://securedoc-client.vercel.app",
@@ -47,11 +46,13 @@ const userSchema = new mongoose.Schema({
 const contentSchema = new mongoose.Schema({
   username: {
     type: String,
-    unique: false,
     required: true,
     lowercase: true,
   },
-  name: String,
+  name: {
+    type: String,
+    required: true,
+  },
   content: {
     type: String,
     default: "<p>This is your document</p>",
@@ -71,6 +72,8 @@ const shareSchema = new mongoose.Schema({
     lowercase: true, // This ensures that all strings are converted to lowercase
   },
 });
+
+contentSchema.index({ username: 1, name: 1 }, { unique: true });
 
 const Share = new mongoose.model("Share", shareSchema);
 
@@ -123,7 +126,7 @@ app.post("/login", async (req, res) => {
     bcrypt.compare(password, user.password, function (err, result) {
       if (err) {
         console.error("Error occurred during password comparison:", err); // Add logging statement
-        return res.status(500).json({error: err});
+        return res.status(500).json({ error: err });
       }
       if (result) {
         // Generate JWT token with user ID
@@ -132,9 +135,17 @@ app.post("/login", async (req, res) => {
           process.env.JWT_SECRET,
           { expiresIn: "1d" }
         );
-        console.log("JWT token generated successfully for user:", user.username); // Add logging statement
+        console.log(
+          "JWT token generated successfully for user:",
+          user.username
+        ); // Add logging statement
         // Set the JWT token as an HTTP-only cookie
-        res.cookie("jwt", token, { httpOnly: true, sameSite: "None", secure: true, domain: "securedoc-server.vercel.app" });
+        res.cookie("jwt", token, {
+          httpOnly: true,
+          sameSite: "None",
+          secure: true,
+          domain: "securedoc-server.vercel.app",
+        });
         res.status(200).json({ message: "Login successful", token: token });
       } else {
         console.log("Invalid password for user:", user.username); // Add logging statement
@@ -147,10 +158,14 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
 app.post("/logout", async (req, res) => {
   try {
-    res.cookie("jwt", " ", { httpOnly: true, sameSite: "None", secure: true, domain: "securedoc-server.vercel.app" });
+    res.cookie("jwt", " ", {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+      domain: "securedoc-server.vercel.app",
+    });
     return res.status(200).send("Logged Out Successfully");
   } catch (error) {
     console.error("Error Logging out", error);
@@ -225,7 +240,7 @@ app.post("/create", async (req, res) => {
 
       if (files.length > 0) {
         return res.status(401).send("Filename must be unique");
-      } 
+      }
 
       const result = await Content.create({ username, name });
       return res.status(200).json(result);
@@ -235,7 +250,6 @@ app.post("/create", async (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 });
-
 
 app.post("/update", async (req, res) => {
   try {
@@ -253,7 +267,7 @@ app.post("/update", async (req, res) => {
 app.post("/delete", async (req, res) => {
   const { name } = req.body;
   const token = req.cookies.jwt;
-  jwt.verify(token, process.env.JWT_SECRET,  async (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     const username = decoded.userId;
     const result = await Content.deleteOne({ username, name });
     if (result) {
@@ -267,7 +281,7 @@ app.post("/delete", async (req, res) => {
 app.post("/share", async (req, res) => {
   const { name, emails } = req.body;
   const token = req.cookies.jwt;
-  jwt.verify(token, process.env.JWT_SECRET,  async (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     const username = decoded.userId;
     const alreadyExist = await Share.findOne({ owner: username, name: name });
     if (alreadyExist) {
