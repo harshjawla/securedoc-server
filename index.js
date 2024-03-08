@@ -207,24 +207,35 @@ app.post("/userfiles", async (req, res) => {
 });
 
 app.post("/create", async (req, res) => {
-  const { name } = req.body;
-  const token = req.cookies.jwt;
-  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-    if(err){
-      return res.status(500).json({error: err});
+  try {
+    const { name } = req.body;
+    const token = req.cookies.jwt;
+
+    if (!token) {
+      return res.status(401).json({ error: "JWT token missing" });
     }
-    const username = decoded.userId;
-    const files = await Content.find({ username, name });
-    if (files.length > 0) {
-      res.status(401).send("Filename must be unique");
-    } else {
-      const result = await Content.create({ username, name });
-      if (result) {
-        res.status(200).json(result);
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
       }
-    }
-  });
+
+      const username = decoded.userId;
+      const files = await Content.find({ username, name });
+
+      if (files.length > 0) {
+        return res.status(401).send("Filename must be unique");
+      }
+
+      const result = await Content.create({ username, name });
+      return res.status(200).json(result);
+    });
+  } catch (error) {
+    console.error("Error creating document:", error);
+    return res.status(500).send("Internal Server Error");
+  }
 });
+
 
 app.post("/update", async (req, res) => {
   try {
