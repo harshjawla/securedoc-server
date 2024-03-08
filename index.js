@@ -64,7 +64,11 @@ const shareSchema = new mongoose.Schema({
     required: true,
     lowercase: true,
   },
-  name: String,
+  name: {
+    type: String,
+    required: true,
+    unique: true
+  },
   shareWith: {
     type: [String],
     lowercase: true, // This ensures that all strings are converted to lowercase
