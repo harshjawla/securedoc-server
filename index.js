@@ -268,6 +268,7 @@ app.post("/delete", async (req, res) => {
     const username = decoded.userId;
     const result = await Content.deleteOne({ username, name });
     if (result) {
+      console.log("result: ", result, "deleted user :", { username, name });
       res.status(200).send("Deleted");
     } else {
       res.status(400).send("failed to delete");
