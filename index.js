@@ -236,7 +236,7 @@ app.post("/create", async (req, res) => {
       }
 
       const username = decoded.userId;
-      const files = await Content.find({ username, name });
+      const files = await Content.find({ name, username });
 
       if (files.length > 0) {
         return res.status(401).send("Filename must be unique");
