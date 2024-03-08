@@ -47,7 +47,6 @@ const userSchema = new mongoose.Schema({
 const contentSchema = new mongoose.Schema({
   username: {
     type: String,
-    unique: true,
     required: true,
     lowercase: true,
   },
@@ -225,7 +224,7 @@ app.post("/create", async (req, res) => {
 
       if (files.length > 0) {
         return res.status(401).send("Filename must be unique");
-      }
+      } 
 
       const result = await Content.create({ username, name });
       return res.status(200).json(result);
