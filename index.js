@@ -36,7 +36,6 @@ mongoose.connect(MONGO_URL);
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    unique: true,
     required: true,
     lowercase: true,
   },
@@ -62,7 +61,6 @@ const contentSchema = new mongoose.Schema({
 const shareSchema = new mongoose.Schema({
   owner: {
     type: String,
-    unique: true,
     required: true,
     lowercase: true,
   },
@@ -72,8 +70,6 @@ const shareSchema = new mongoose.Schema({
     lowercase: true, // This ensures that all strings are converted to lowercase
   },
 });
-
-contentSchema.index({ username: 1, name: 1 }, { unique: true });
 
 const Share = new mongoose.model("Share", shareSchema);
 
