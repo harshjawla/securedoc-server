@@ -36,7 +36,6 @@ mongoose.connect(MONGO_URL);
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: true,
     lowercase: true,
   },
   password: String,
@@ -45,12 +44,10 @@ const userSchema = new mongoose.Schema({
 const contentSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: true,
     lowercase: true,
   },
   name: {
     type: String,
-    required: true,
   },
   content: {
     type: String,
