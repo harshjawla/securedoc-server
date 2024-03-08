@@ -210,6 +210,9 @@ app.post("/create", async (req, res) => {
   const { name } = req.body;
   const token = req.cookies.jwt;
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+    if(err){
+      return res.status(500).json({error: err});
+    }
     const username = decoded.userId;
     const files = await Content.find({ username, name });
     if (files.length > 0) {
